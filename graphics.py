@@ -83,3 +83,14 @@ class Cell:
             self._window.draw_line(
                 Line(Point(self._x1, self._y1), Point(self._x1, self._y2))
             )
+
+    def draw_move(self, to_cell: "Cell", undo: bool = False) -> None:
+        def middle_point(cell: "Cell") -> Point:
+            return Point(
+                round((cell._x1 + cell._x2) / 2), round((cell._y1 + cell._y2) / 2)
+            )
+
+        color = "gray" if undo else "red"
+        start = middle_point(self)
+        end = middle_point(to_cell)
+        self._window.draw_line(Line(start, end), color)
