@@ -64,6 +64,7 @@ class Cell:
         self.bottom_wall = True
         self.left_wall = True
         self._window = window
+        self.visited = False
 
     def draw(self, x1: int, y1: int, x2: int, y2: int) -> None:
         def draw_wall(x1: int, y1: int, x2: int, y2: int, color: bool) -> None:

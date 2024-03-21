@@ -1,3 +1,4 @@
+import random
 from time import sleep
 
 from graphics import Cell, Window
@@ -23,8 +24,11 @@ class Maze:
         self._cell_size_y = cell_size_y
         self._window = window
 
+        random.seed()
+
         self._create_cells()
         self._break_entrance_and_exit()
+        self._break_walls_r(0, 0)
 
     def _create_cells(self) -> None:
         self._cells = [
@@ -56,3 +60,39 @@ class Maze:
 
         bottom_right.bottom_wall = False
         self._draw_cell(bottom_right, len(self._cells) - 1, len(self._cells[0]) - 1)
+
+    def _break_walls_r(self, column_index: int, row_index: int) -> None:
+        def get_next_cell(column_index, row_index) -> None:
+            if 0 <= column_index < self._num_cols and 0 <= row_index < self._num_rows:
+                cell = self._cells[column_index][row_index]
+                if not cell.visited:
+                    return cell
+
+        current = self._cells[column_index][row_index]
+        current.visited = True
+
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        random.shuffle(directions)
+
+        for direction in directions:
+            x_direction, y_direction = direction
+            next_x = column_index + x_direction
+            next_y = row_index + y_direction
+            next_cell = get_next_cell(next_x, next_y)
+            if next_cell:
+                if x_direction == -1:
+                    current.left_wall = False
+                    next_cell.right_wall = False
+                elif x_direction == 1:
+                    current.right_wall = False
+                    next_cell.left_wall = False
+                elif y_direction == -1:
+                    current.top_wall = False
+                    next_cell.bottom_wall = False
+                elif y_direction == 1:
+                    current.bottom_wall = False
+                    next_cell.top_wall = False
+
+                self._break_walls_r(next_x, next_y)
+
+        self._draw_cell(current, column_index, row_index)
