@@ -49,7 +49,6 @@ class Maze:
 
     def _animate(self) -> None:
         self._window.redraw()
-        sleep(0.05)
 
     def _break_entrance_and_exit(self) -> None:
         top_left = self._cells[0][0]
