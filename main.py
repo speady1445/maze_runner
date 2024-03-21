@@ -1,4 +1,4 @@
-from window import Window
+from graphics import Window
 
 
 def main() -> None:
