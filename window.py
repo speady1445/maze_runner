@@ -2,7 +2,7 @@ from tkinter import BOTH, Canvas, Tk
 
 
 class Window:
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int) -> None:
         self._root = Tk()
         self._root.title("Maze Runner")
         self._canvas = Canvas(self._root, width=width, height=height)
@@ -10,17 +10,17 @@ class Window:
         self._running = False
         self._root.protocol("WM_DELETE_WINDOW", self.close)
 
-    def redraw(self):
+    def redraw(self) -> None:
         self._root.update_idletasks()
         self._root.update()
 
-    def wait_for_close(self):
+    def wait_for_close(self) -> None:
         self._running = True
         while self._running:
             self.redraw()
         print("window closed...")
 
-    def close(self):
+    def close(self) -> None:
         self._running = False
 
     def draw_line(self, line: "Line", fill_color: str) -> None:
