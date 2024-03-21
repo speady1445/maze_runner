@@ -24,6 +24,7 @@ class Maze:
         self._window = window
 
         self._create_cells()
+        self._break_entrance_and_exit()
 
     def _create_cells(self) -> None:
         self._cells = [
@@ -45,3 +46,13 @@ class Maze:
     def _animate(self) -> None:
         self._window.redraw()
         sleep(0.05)
+
+    def _break_entrance_and_exit(self) -> None:
+        top_left = self._cells[0][0]
+        bottom_right = self._cells[-1][-1]
+
+        top_left.top_wall = False
+        self._draw_cell(top_left, 0, 0)
+
+        bottom_right.bottom_wall = False
+        self._draw_cell(bottom_right, len(self._cells) - 1, len(self._cells[0]) - 1)

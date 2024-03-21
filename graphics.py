@@ -23,7 +23,10 @@ class Window:
     def close(self) -> None:
         self._running = False
 
-    def draw_line(self, line: "Line", fill_color: str = "black") -> None:
+    def draw_line(self, line: "Line", fill_color: str | None = None) -> None:
+        if fill_color is None:
+            fill_color = self._canvas["background"]
+        assert fill_color is not None
         line.draw(self._canvas, fill_color)
 
 
@@ -63,26 +66,20 @@ class Cell:
         self._window = window
 
     def draw(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        def draw_wall(x1: int, y1: int, x2: int, y2: int, color: bool) -> None:
+            self._window.draw_line(
+                Line(Point(x1, y1), Point(x2, y2)), "black" if color else None
+            )
+
         self._x1 = x1
         self._y1 = y1
         self._x2 = x2
         self._y2 = y2
-        if self.top_wall:
-            self._window.draw_line(
-                Line(Point(self._x1, self._y1), Point(self._x2, self._y1))
-            )
-        if self.right_wall:
-            self._window.draw_line(
-                Line(Point(self._x2, self._y1), Point(self._x2, self._y2))
-            )
-        if self.bottom_wall:
-            self._window.draw_line(
-                Line(Point(self._x1, self._y2), Point(self._x2, self._y2))
-            )
-        if self.left_wall:
-            self._window.draw_line(
-                Line(Point(self._x1, self._y1), Point(self._x1, self._y2))
-            )
+
+        draw_wall(self._x1, self._y1, self._x2, self._y1, self.top_wall)
+        draw_wall(self._x2, self._y1, self._x2, self._y2, self.right_wall)
+        draw_wall(self._x1, self._y2, self._x2, self._y2, self.bottom_wall)
+        draw_wall(self._x1, self._y1, self._x1, self._y2, self.left_wall)
 
     def draw_move(self, to_cell: "Cell", undo: bool = False) -> None:
         def middle_point(cell: "Cell") -> Point:
