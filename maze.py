@@ -5,6 +5,8 @@ from graphics import Cell, Window
 
 
 class Maze:
+    _directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
     def __init__(
         self,
         x1: int,
@@ -29,6 +31,7 @@ class Maze:
         self._create_cells()
         self._break_entrance_and_exit()
         self._break_walls_r(0, 0)
+        self._reset_cells_visited()
 
     def _create_cells(self) -> None:
         self._cells = [
@@ -61,24 +64,24 @@ class Maze:
         bottom_right.bottom_wall = False
         self._draw_cell(bottom_right, len(self._cells) - 1, len(self._cells[0]) - 1)
 
-    def _break_walls_r(self, column_index: int, row_index: int) -> None:
-        def get_next_cell(column_index, row_index) -> None:
-            if 0 <= column_index < self._num_cols and 0 <= row_index < self._num_rows:
-                cell = self._cells[column_index][row_index]
-                if not cell.visited:
-                    return cell
+    def _get_next_cell(self, column_index, row_index) -> Cell | None:
+        if 0 <= column_index < self._num_cols and 0 <= row_index < self._num_rows:
+            cell = self._cells[column_index][row_index]
+            if not cell.visited:
+                return cell
 
+    def _break_walls_r(self, column_index: int, row_index: int) -> None:
         current = self._cells[column_index][row_index]
         current.visited = True
 
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        directions = self._directions.copy()
         random.shuffle(directions)
 
         for direction in directions:
             x_direction, y_direction = direction
             next_x = column_index + x_direction
             next_y = row_index + y_direction
-            next_cell = get_next_cell(next_x, next_y)
+            next_cell = self._get_next_cell(next_x, next_y)
             if next_cell:
                 if x_direction == -1:
                     current.left_wall = False
@@ -96,3 +99,40 @@ class Maze:
                 self._break_walls_r(next_x, next_y)
 
         self._draw_cell(current, column_index, row_index)
+
+    def _reset_cells_visited(self) -> None:
+        for column in self._cells:
+            for cell in column:
+                cell.visited = False
+
+    def solve(self) -> None:
+        self._solve_r(0, 0)
+
+    def _solve_r(self, start_x: int, start_y: int) -> bool:
+        self._animate()
+        if start_x == len(self._cells) - 1 and start_y == len(self._cells[0]) - 1:
+            return True
+        current_cell = self._cells[start_x][start_y]
+        current_cell.visited = True
+
+        for direction in self._directions:
+            x_direction, y_direction = direction
+            next_x = start_x + x_direction
+            next_y = start_y + y_direction
+            next_cell = self._get_next_cell(next_x, next_y)
+            if next_cell:
+                if x_direction == -1:
+                    direction_text = "left"
+                elif x_direction == 1:
+                    direction_text = "right"
+                elif y_direction == -1:
+                    direction_text = "top"
+                elif y_direction == 1:
+                    direction_text = "bottom"
+
+                if not getattr(current_cell, f"{direction_text}_wall"):
+                    current_cell.draw_move(next_cell)
+                    if self._solve_r(next_x, next_y):
+                        return True
+                    current_cell.draw_move(next_cell, True)
+        return False

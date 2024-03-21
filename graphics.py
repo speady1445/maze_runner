@@ -88,7 +88,7 @@ class Cell:
                 round((cell._x1 + cell._x2) / 2), round((cell._y1 + cell._y2) / 2)
             )
 
-        color = "gray" if undo else "red"
+        color = "blue" if undo else "red"
         start = middle_point(self)
         end = middle_point(to_cell)
         self._window.draw_line(Line(start, end), color)
